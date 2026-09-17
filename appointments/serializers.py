@@ -20,8 +20,12 @@ class AppointmentSerializer(serializers.ModelSerializer):
         return value
 
     def validate_appointment_time(self, value):
-        if self.initial_data.get('appointment_date') == str(timezone.now().date()) and value < timezone.now().time():
-            raise serializers.ValidationError("Appointment time cannot be in the past.")
+        return value
+
+    def validate_customer_phone(self, value):
+        normalized = value.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+        if not normalized.isdigit() or not 7 <= len(normalized) <= 15:
+            raise serializers.ValidationError("Enter a valid phone number with 7 to 15 digits.")
         return value
 
     def validate_service(self, value):
@@ -39,7 +43,20 @@ class AppointmentSerializer(serializers.ModelSerializer):
         conflict = Appointment.objects.filter(
             appointment_date=attrs.get('appointment_date'),
             appointment_time=attrs.get('appointment_time')
-        ) 
-        if conflict:
+        )
+        if self.instance:
+            conflict = conflict.exclude(pk=self.instance.pk)
+        if conflict.exists():
             raise serializers.ValidationError("This time slot is already booked for the selected doctor.")
+        appointment_date = attrs.get(
+            'appointment_date',
+            self.instance.appointment_date if self.instance else None,
+        )
+        appointment_time = attrs.get(
+            'appointment_time',
+            self.instance.appointment_time if self.instance else None,
+        )
+        if appointment_date == timezone.localdate() and appointment_time <= timezone.localtime().time():
+            raise serializers.ValidationError("Appointment time must be in the future.")
+        return attrs
 

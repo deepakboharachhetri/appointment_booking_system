@@ -9,12 +9,14 @@ from .serializers import AppointmentSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import filters
 
 
 class AppointmentsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch','delete']  # noqa: RUF012
-    filter_backends = [DjangoFilterBackend]  # noqa: RUF012
-    filterset_fields = ['status']  # noqa: RUF012
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]  # noqa: RUF012
+    filterset_fields = ['status', 'appointment_date']  # noqa: RUF012
+    search_fields = ['customer_name', 'customer_phone']  # noqa: RUF012
     queryset = Appointment.objects.all()
     permission_classes = [IsStaff]  # noqa: RUF012
     serializer_class = AppointmentSerializer
