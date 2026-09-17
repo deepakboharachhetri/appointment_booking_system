@@ -5,7 +5,9 @@ from .models import Service
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ['id', 'name', 'price', 'duration',]  # noqa: RUF012
+        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'price', 'duration','created_at', 'updated_at']  # noqa: RUF012
+
 
     def validate_price(self, value):
         if value < 0:
