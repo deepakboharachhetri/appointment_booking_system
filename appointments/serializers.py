@@ -34,3 +34,12 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if value not in valid_statuses:
             raise serializers.ValidationError(f"Status must be one of {valid_statuses}.")
         return value
+
+    def validate(self, attrs):
+        conflict = Appointment.objects.filter(
+            appointment_date=attrs.get('appointment_date'),
+            appointment_time=attrs.get('appointment_time')
+        ) 
+        if conflict:
+            raise serializers.ValidationError("This time slot is already booked for the selected doctor.")
+
