@@ -46,6 +46,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         )
         if self.instance:
             conflict = conflict.exclude(pk=self.instance.pk)
+            
         if conflict.exists():
             raise serializers.ValidationError("This time slot is already booked for the selected doctor.")
         appointment_date = attrs.get(

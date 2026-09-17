@@ -11,7 +11,7 @@ class Appointment(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    customer_name = models.CharField(max_length=100)
+    customer_name = models.CharField(max_length=510)
     customer_phone = models.CharField(max_length=15)
     service = models.ForeignKey('services.Service', on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
